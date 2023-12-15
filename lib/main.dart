@@ -96,11 +96,8 @@ class _ScrollingState extends State<Scrolling> {
         } else {
           selectedPointIndex = args.pointIndex;
         }
-
-        setState(() {
-          axisVisibleMin = selectedPointIndex! - 2.toDouble();
-          axisVisibleMax = selectedPointIndex! + 2.toDouble();
-        });
+        axisVisibleMin = selectedPointIndex! - 2.toDouble();
+        axisVisibleMax = selectedPointIndex! + 2.toDouble();
       },
       backgroundColor: Colors.white,
       plotAreaBorderWidth: 0,
@@ -137,10 +134,8 @@ class _ScrollingState extends State<Scrolling> {
     if (direction == ChartSwipeDirection.end &&
         (axisVisibleMax + 5.toDouble()) < chartData.length) {
       isLoad = true;
-      setState(() {
-        axisVisibleMin = axisVisibleMin + 5.toDouble();
-        axisVisibleMax = axisVisibleMax + 5.toDouble();
-      });
+      axisVisibleMin = axisVisibleMin + 5.toDouble();
+      axisVisibleMax = axisVisibleMax + 5.toDouble();
       _axisController!.visibleMaximum = axisVisibleMax;
       _axisController!.visibleMinimum = axisVisibleMin;
       Future.delayed(const Duration(milliseconds: 1000), () {
@@ -148,15 +143,13 @@ class _ScrollingState extends State<Scrolling> {
       });
     } else if (direction == ChartSwipeDirection.start &&
         (axisVisibleMin - 5.toDouble()) >= 0) {
-      setState(() {
-        axisVisibleMin = axisVisibleMin - 5.toDouble();
-        axisVisibleMax = axisVisibleMax - 5.toDouble();
-        Future.delayed(const Duration(milliseconds: 1000), () {
-          selectionBehavior.selectDataPoints((axisVisibleMin.toInt()) + 2);
-        });
-      });
+      axisVisibleMin = axisVisibleMin - 5.toDouble();
+      axisVisibleMax = axisVisibleMax - 5.toDouble();
       _axisController!.visibleMaximum = axisVisibleMax;
       _axisController!.visibleMinimum = axisVisibleMin;
+      Future.delayed(const Duration(milliseconds: 1000), () {
+        selectionBehavior.selectDataPoints((axisVisibleMin.toInt()) + 2);
+      });
     }
   }
 }
