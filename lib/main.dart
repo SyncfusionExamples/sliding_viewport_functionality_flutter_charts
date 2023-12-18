@@ -40,6 +40,8 @@ class _ScrollingState extends State<Scrolling> {
 
   late SelectionBehavior selectionBehavior;
 
+  NumericAxisController? _axisController;
+
   int? selectedPointIndex;
 
   bool isLoad = false;
@@ -94,17 +96,17 @@ class _ScrollingState extends State<Scrolling> {
         } else {
           selectedPointIndex = args.pointIndex;
         }
-
-        setState(() {
-          axisVisibleMin = selectedPointIndex! - 2.toDouble();
-          axisVisibleMax = selectedPointIndex! + 2.toDouble();
-        });
+        axisVisibleMin = selectedPointIndex! - 2.toDouble();
+        axisVisibleMax = selectedPointIndex! + 2.toDouble();
       },
       backgroundColor: Colors.white,
       plotAreaBorderWidth: 0,
       primaryXAxis: NumericAxis(
-          visibleMinimum: axisVisibleMin,
-          visibleMaximum: axisVisibleMax,
+          onRendererCreated: (NumericAxisController controller) {
+            _axisController = controller;
+          },
+          initialVisibleMinimum: axisVisibleMin,
+          initialVisibleMaximum: axisVisibleMax,
           interval: 2,
           edgeLabelPlacement: EdgeLabelPlacement.shift,
           majorGridLines: MajorGridLines(width: 0)),
@@ -117,8 +119,8 @@ class _ScrollingState extends State<Scrolling> {
     );
   }
 
-  List<ChartSeries<OrdinalData, num>> getSeries() {
-    return <ChartSeries<OrdinalData, num>>[
+  List<CartesianSeries<OrdinalData, num>> getSeries() {
+    return <CartesianSeries<OrdinalData, num>>[
       ColumnSeries<OrdinalData, num>(
         dataSource: chartData,
         selectionBehavior: selectionBehavior,
@@ -132,21 +134,21 @@ class _ScrollingState extends State<Scrolling> {
     if (direction == ChartSwipeDirection.end &&
         (axisVisibleMax + 5.toDouble()) < chartData.length) {
       isLoad = true;
-      setState(() {
-        axisVisibleMin = axisVisibleMin + 5.toDouble();
-        axisVisibleMax = axisVisibleMax + 5.toDouble();
-      });
+      axisVisibleMin = axisVisibleMin + 5.toDouble();
+      axisVisibleMax = axisVisibleMax + 5.toDouble();
+      _axisController!.visibleMaximum = axisVisibleMax;
+      _axisController!.visibleMinimum = axisVisibleMin;
       Future.delayed(const Duration(milliseconds: 1000), () {
         selectionBehavior.selectDataPoints((axisVisibleMin.toInt()) + 2);
       });
     } else if (direction == ChartSwipeDirection.start &&
         (axisVisibleMin - 5.toDouble()) >= 0) {
-      setState(() {
-        axisVisibleMin = axisVisibleMin - 5.toDouble();
-        axisVisibleMax = axisVisibleMax - 5.toDouble();
-        Future.delayed(const Duration(milliseconds: 1000), () {
-          selectionBehavior.selectDataPoints((axisVisibleMin.toInt()) + 2);
-        });
+      axisVisibleMin = axisVisibleMin - 5.toDouble();
+      axisVisibleMax = axisVisibleMax - 5.toDouble();
+      _axisController!.visibleMaximum = axisVisibleMax;
+      _axisController!.visibleMinimum = axisVisibleMin;
+      Future.delayed(const Duration(milliseconds: 1000), () {
+        selectionBehavior.selectDataPoints((axisVisibleMin.toInt()) + 2);
       });
     }
   }
